@@ -1,0 +1,20 @@
+LC update notifier
+==============
+
+Little PHP script meant to be used in Codecanyon premium plugins. Takes advantage of wordpress systems to inform customers about plugin updates and show update infos as well as changelogs.
+
+Has been coded to be used in the most simple way, without changing a line of code for multiple implementations or after plugin updates.
+
+Works only from WP 3.5 (otherwise will be off)
+
+
+
+## How to use
+
+// TODO
+
+
+
+* * *
+
+Copyright (c) 2014 Luca Montanari 
