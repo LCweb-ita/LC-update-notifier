@@ -1,7 +1,7 @@
 <?php
 /**                                                           
  *   Codecanyon plugin updates notificator       			  *
- *	 version 1.11											  *
+ *	 version 1.12											  *
  *   fully compatible from WP 3.5              				  *
  *															  *
  *   Author: Luca Montanari (LCweb)                           *
@@ -36,7 +36,7 @@ class lc_update_notifier {
 		$this->globals('basepath', 'set', $this->basepath);
 		
 		// cannot use wp_get_update_data from admin init - use two steps
-		if( function_exists('get_transient') ) {
+		if( function_exists('get_transient') && !isset($_COOKIE[ md5(get_site_url()).'_lcun_sc'] )) { // cookie to avoid continuous redirect
 			if(get_transient('lcun_cache') ) {
 				add_action('init', array($this, 'init_check'), 1);	
 			}
@@ -70,7 +70,7 @@ class lc_update_notifier {
 		if($this->is_last_call()) {
 			if(is_admin() && current_user_can('install_plugins')) {
 				$GLOBALS['lcun_to_update'] = get_transient('lcun_cache');
-				if(count($GLOBALS['lcun_to_update']) > 0) {
+				if(is_array($GLOBALS['lcun_to_update']) && count($GLOBALS['lcun_to_update']) > 0) {
 					// only from WP 3.5
 					if((float)substr(get_bloginfo('version'), 0, 3) >= 3.5) {
 						add_filter('wp_get_update_data', array($this, 'update_count'));
@@ -117,7 +117,11 @@ class lc_update_notifier {
 				}
 
 				$return = set_transient('lcun_cache', $lcun_to_update, 7200); // cache each 2 hours
+				
 				if($return && !isset($_REQUEST['lcun_redirect'])) {
+					// set security cookie
+					setcookie( md5(get_site_url()).'_lcun_sc' , "1", time()+7200);
+					
 					if(strpos($this->curr_url(), '?') === false) {
 						header('location: '. $this->curr_url().'?lcun_redirect=1' );
 					} else {
