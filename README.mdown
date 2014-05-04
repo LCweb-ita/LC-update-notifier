@@ -1,19 +1,61 @@
-LC update notifier
-==============
+##LC update notifier
 
 Little PHP script meant to be used in Codecanyon premium plugins. Takes advantage of wordpress systems to inform customers about plugin updates and show update infos as well as changelogs.
 
-Has been coded to be used in the most simple way, without changing a line of code for multiple implementations or after plugin updates.
+Has been coded to be used in the most simple way, without changing a line of code in plugins for multiple implementations or after updates.
 
-Works only from WP 3.5 (otherwise will be off)
-
-
-
-## How to use
-
-// TODO
+* Works only from WP 3.5 (otherwise script won't be executed)
+* Requires cURL module to be enabled (otherwise script won't be executed)
 
 
+### How to use
+
+1. Include the file and initialize the class in the main plugin file, __checking if already exists in the website__
+    
+    ``` php
+    // UPDATE NOTIFIER
+    if(!class_exists('lc_update_notifier')) {
+        include_once('lc_update_notifier.php');
+    }
+    $endpoint = 'http://url/to/the/json/endpoint';
+    $lcun = new lc_update_notifier(__FILE__, $endpoint);
+    ```
+    __$endpoint__ variable contains the URL to the file returning the JSON object with latest version and notes.
+
+
+2. Create a valid endpoint, readable by the script. I prefer to create a an array with the data and let PHP encodes it as JSON. Example for my Media Grid plugin:
+
+    ``` php
+    <?php
+    $a = array(
+        'version' => '2.44',
+        'note' => '
+        <h2>Update Instructions</h2>
+        <ol>
+            <li>delete previous version of the plugin from the wordpress plugin panel</li>
+            <li>install new version as explained in the documentation</li>
+            <li>save again the plugin settings to recreate the custom CSS</li>
+        </ol>
+        <hr/>
+        <p>Check the changelog <a href="http://www.projects.lcweb.it/media-grid/changelog" target="_blank">here</a></p>'
+    );
+    
+    ///////////////////////////////////
+    
+    header('Content-Type: application/json');
+    echo json_encode($a);
+    ?>
+    ```
+    JSON must contains two indexes: VERSION and NOTE
+    
+    * __Version__ - is the latest plugin version and must be a a floating-point number
+    * __Note__ - are the update notes and can contain html code
+
+
+#### Notes
+
+* endpoints are cached every 2 hours or whenever a plugin is disabled/enabled
+* of course the script works only on active plugins
 
 * * *
 
