@@ -1,7 +1,7 @@
 <?php
 /**                                                           
  *   Codecanyon plugin updates notificator       			  *
- *	 version 1.12											  *
+ *	 version 1.13											  *
  *   fully compatible from WP 3.5              				  *
  *															  *
  *   Author: Luca Montanari (LCweb)                           *
@@ -27,7 +27,7 @@ class lc_update_notifier {
 		if(!function_exists('curl_version')) {return false;}
 		
 		// get true basepath
-		$arr = explode('/', $path); 
+		$arr = explode(DIRECTORY_SEPARATOR, $path); 
 		if(count($arr) < 2) {return false;}
 		$this->basepath = $arr[(count($arr) - 2)] .'/'. $arr[(count($arr) - 1)];
 
@@ -36,12 +36,14 @@ class lc_update_notifier {
 		$this->globals('basepath', 'set', $this->basepath);
 		
 		// cannot use wp_get_update_data from admin init - use two steps
-		if( function_exists('get_transient') && !isset($_COOKIE[ md5(get_site_url()).'_lcun_sc'] )) { // cookie to avoid continuous redirect
+		if(function_exists('get_transient')) { // cookie to avoid continuous redirect
 			if(get_transient('lcun_cache') ) {
 				add_action('init', array($this, 'init_check'), 1);	
 			}
 			else {
-				add_action('admin_init', array($this, 'data_collect'), 999);
+				if(!isset($_COOKIE[ md5(get_site_url()).'_lcun_sc'])) {
+					add_action('admin_init', array($this, 'data_collect'), 999);
+				}
 			}
 		}
 	}
@@ -102,7 +104,7 @@ class lc_update_notifier {
 					$rm_data = $this->get_remote( $data['url'][$a] );
 					if($rm_data) { 
 						$rm_arr = (array)json_decode($rm_data);
-						
+
 						if(isset($rm_arr['version']) && (float)$rm_arr['version'] > $curr_version) {
 							$lcun_to_update[ $data['id'][$a] ] = array(
 								'name' 		=> $plugin_data['Name'],
@@ -279,7 +281,7 @@ class lc_update_notifier {
 			$notes = array();
 			
 			foreach($GLOBALS['lcun_to_update'] as $pid => $data) {	
-				$bp_arr = explode('/', $data['basepath']);
+				$bp_arr = explode(DIRECTORY_SEPARATOR, $data['basepath']);
 				$id[] = sanitize_title($data['name']);
 				$name[] = $data['name'];
 				$new_ver[] = $data['new_ver'];
@@ -335,6 +337,5 @@ add_action('deactivated_plugin', 'lcun_erase_cache');
 
 function lcun_erase_cache() {
 	delete_transient('lcun_cache');
+	setcookie( md5(get_site_url()).'_lcun_sc' , "", time()-3600);
 }
-
-?>
