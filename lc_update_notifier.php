@@ -1,11 +1,11 @@
 <?php
 /**                                                           
  *   Codecanyon plugin updates notificator       			  *
- *	 version 1.13											  *
+ *	 version 1.14											  *
  *   fully compatible from WP 3.5              				  *
  *															  *
  *   Author: Luca Montanari (LCweb)                           *
- *   Site: http://www.projects.lcweb.it/					  *
+ *   Site: http://www.lcweb.it/					  			  *
  *                                                            *
  **/
  
@@ -224,7 +224,7 @@ class lc_update_notifier {
 		<table class="update-premium-plugins-table widefat" cellspacing="0">
 			<tbody class="plugins">
 		';
-		
+
 		foreach($GLOBALS['lcun_to_update'] as $pid => $data) {	
 			echo '
 			<tr style="box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1) inset;">
@@ -259,7 +259,7 @@ class lc_update_notifier {
                     e.preventDefault();
                     tb_show('Plugin Information: '+ jQuery(this).attr('pcun_name') , '#TB_inline?height=600&width=640&inlineId='+ jQuery(this).attr('rel'));
 					setTimeout(function() {
-						jQuery('#TB_window').css('background-color', '#fff');
+						jQuery('#TB_window').css('background-color', '#fff').css('background-image', 'none');
 					}, 50);
                 });
             });
@@ -269,7 +269,7 @@ class lc_update_notifier {
 	}
 	
 	
-	// dinamically add code to show updates
+	// dinamically add code to show updates in plugins list
 	public function plugin_list_message() {
 		global $current_screen;
 		if(isset($current_screen->base) && $current_screen->base == 'plugins' && is_array($GLOBALS['lcun_to_update'])) {
@@ -287,19 +287,19 @@ class lc_update_notifier {
 				$new_ver[] = $data['new_ver'];
 				$notes[] = addslashes($data['note']);
 			}
-
+	
 			wp_enqueue_script('jquery');
 			?>
             <script type="text/javascript">
 			var id 		= ['<?php echo implode("','", $id) ?>'];
-			var name 	= ['<?php echo implode("','", $name) ?>'];
+			var lcun_name = ['<?php echo implode("','", $name) ?>']; // safe name with prefix
 			var new_ver = ['<?php echo implode("','", $new_ver) ?>'];
 			var notes 	= ['<?php echo implode("','", $notes) ?>'];
 			
 			jQuery(document).ready(function(e) {
 				jQuery.each(id, function(i, v) {
 					if(notes[i] != '') {
-						var pl_note = ' or <a class="lcun_update_note" pcun_name="'+ name[i] +'" rel="pcunh_'+ v +'" href="">view update notes</a>';
+						var pl_note = ' or <a class="lcun_update_note" pcun_name="'+ lcun_name[i] +'" rel="pcunh_'+ v +'" href="">view update notes</a>';
 						jQuery('body').append('<div id="pcunh_'+ v +'" style="display: none;">'+ notes[i] +'</div>');
 					}
 					else {var pl_note = '';} 
@@ -308,19 +308,31 @@ class lc_update_notifier {
 					<tr class="plugin-update-tr">\
 						<td colspan="3" class="plugin-update colspanchange">\
 							<div class="update-message">\
-							There is a new version of '+ name[i] +' available. \
-							<a href="http://codecanyon.net/downloads" title="'+ name[i] +'" target="_blank">Download version '+ new_ver[i] +'</a>'+ pl_note +'.</div>\
+							There is a new version of '+ lcun_name[i] +' available. \
+							<a href="http://codecanyon.net/downloads" title="'+ lcun_name[i] +'" target="_blank">Download version '+ new_ver[i] +'</a>'+ pl_note +'.</div>\
 						</td>\
 					</tr>';
 					jQuery('#'+v).addClass('update');
 					jQuery('#'+v).after(code);
+					
+					<?php 
+					// if WP 4 - hide "view details" link
+					if((float)substr(get_bloginfo('version'), 0, 3) >= 4) {
+						?>
+						jQuery('#'+v).find('a.thickbox').remove();
+						var v4_txt = jQuery('#'+v).find('.plugin-version-author-uri').html(); 
+						jQuery('#'+v).find('.plugin-version-author-uri').html( v4_txt.slice(0,-2) );
+						<?php	
+					} 
+					?>
 				});
 				
+				// show thickbox
 				jQuery('body').delegate('.lcun_update_note', "click", function (e) {
 					e.preventDefault();
 					tb_show('Plugin Information: '+ jQuery(this).attr('pcun_name') , '#TB_inline?height=600&width=640&inlineId='+ jQuery(this).attr('rel'));
 					setTimeout(function() {
-						jQuery('#TB_window').css('background-color', '#fff');
+						jQuery('#TB_window').css('background-color', '#fff').css('background-image', 'none');
 					}, 50);
 				});
 			});
