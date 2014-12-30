@@ -100,13 +100,13 @@ class lc_update_notifier {
 				for($a=0; $a < count($data['id']); $a++) {
 					$plugin_id = trim(plugin_dir_path($data['basepath'][$a]), '/\\');
 					$plugin_data = get_plugin_data(apply_filters('lc_update_notifier_main_plugin_file_'.$plugin_id, WP_PLUGIN_DIR . '/' . $data['basepath'][$a]));
-					$curr_version = (float)$plugin_data['Version'];	
+					$curr_version = $plugin_data['Version'];	
 		
 					$rm_data = $this->get_remote( $data['url'][$a] );
 					if($rm_data) { 
 						$rm_arr = (array)json_decode($rm_data);
 
-						if(isset($rm_arr['version']) && (float)$rm_arr['version'] > $curr_version) {
+						if(isset($rm_arr['version']) && version_compare($rm_arr['version'], $curr_version) > 0) {
 							$lcun_to_update[ $data['id'][$a] ] = array(
 								'name' 		=> $plugin_data['Name'],
 								'basepath'	=> $data['basepath'][$a],
