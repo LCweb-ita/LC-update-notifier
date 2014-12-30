@@ -323,10 +323,10 @@ class lc_update_notifier {
 						jQuery('#'+v).find('a.thickbox').remove();
 						var v4_txt = jQuery('#'+v).find('.plugin-version-author-uri').html(); 
 						
-						if( v4_txt.slice(0,-1) == '|')
+						if( v4_txt.slice(-2) == '| ')
 							jQuery('#'+v).find('.plugin-version-author-uri').html( v4_txt.slice(0,-2) );
 						<?php	
-					} 
+					}
 					?>
 				});
 				
