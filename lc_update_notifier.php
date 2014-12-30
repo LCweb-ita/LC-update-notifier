@@ -98,7 +98,8 @@ class lc_update_notifier {
 				
 				// check all the registered plugins
 				for($a=0; $a < count($data['id']); $a++) {
-					$plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/' . $data['basepath'][$a]);
+					$plugin_id = trim(plugin_dir_path($data['basepath'][$a]), '/\\');
+					$plugin_data = get_plugin_data(apply_filters('lc_update_notifier_main_plugin_file_'.$plugin_id, WP_PLUGIN_DIR . '/' . $data['basepath'][$a]));
 					$curr_version = (float)$plugin_data['Version'];	
 		
 					$rm_data = $this->get_remote( $data['url'][$a] );
@@ -321,7 +322,9 @@ class lc_update_notifier {
 						?>
 						jQuery('#'+v).find('a.thickbox').remove();
 						var v4_txt = jQuery('#'+v).find('.plugin-version-author-uri').html(); 
-						jQuery('#'+v).find('.plugin-version-author-uri').html( v4_txt.slice(0,-2) );
+						
+						if( v4_txt.slice(0,-1) == '|')
+							jQuery('#'+v).find('.plugin-version-author-uri').html( v4_txt.slice(0,-2) );
 						<?php	
 					} 
 					?>
