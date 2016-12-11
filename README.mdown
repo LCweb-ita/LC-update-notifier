@@ -59,4 +59,4 @@ Has been coded to be used in the most simple way, without changing a line of cod
 
 * * *
 
-Copyright (c) 2014 Luca Montanari 
+Copyright &copy; Luca Montanari 
