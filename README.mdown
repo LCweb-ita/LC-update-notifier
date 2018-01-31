@@ -1,4 +1,4 @@
-##LC update notifier
+#LC update notifier
 
 Little PHP script meant to be used in Codecanyon premium plugins. Takes advantage of wordpress systems to inform customers about plugin updates and show update infos as well as changelogs.
 
@@ -59,4 +59,4 @@ Has been coded to be used in the most simple way, without changing a line of cod
 
 * * *
 
-Copyright &copy; Luca Montanari 
+Copyright &copy; Luca Montanari (aka LCweb)
