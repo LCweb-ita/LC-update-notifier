@@ -99,13 +99,13 @@ class lc_update_notifier {
 				// check all the registered plugins
 				for($a=0; $a < count($data['id']); $a++) {
 					$plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/' . $data['basepath'][$a]);
-					$curr_version = (float)$plugin_data['Version'];	
+					$curr_version = $plugin_data['Version'];	
 		
 					$rm_data = $this->get_remote( $data['url'][$a] );
 					if($rm_data) { 
 						$rm_arr = (array)json_decode($rm_data);
 
-						if(isset($rm_arr['version']) && (float)$rm_arr['version'] > $curr_version) {
+						if(isset($rm_arr['version']) && version_compare($rm_arr['version'], $curr_version) > 0) {
 							$lcun_to_update[ $data['id'][$a] ] = array(
 								'name' 		=> $plugin_data['Name'],
 								'basepath'	=> $data['basepath'][$a],
@@ -321,9 +321,11 @@ class lc_update_notifier {
 						?>
 						jQuery('#'+v).find('a.thickbox').remove();
 						var v4_txt = jQuery('#'+v).find('.plugin-version-author-uri').html(); 
-						jQuery('#'+v).find('.plugin-version-author-uri').html( v4_txt.slice(0,-2) );
+						
+						if( v4_txt.slice(-2) == '| ')
+							jQuery('#'+v).find('.plugin-version-author-uri').html( v4_txt.slice(0,-2) );
 						<?php	
-					} 
+					}
 					?>
 				});
 				
